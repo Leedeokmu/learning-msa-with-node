@@ -1,0 +1,7 @@
+.idea
+.dec
+**/*.iml
+**/node_modules
+**/.next/
+**/build/
+**/*-lock.json

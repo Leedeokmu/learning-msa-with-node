@@ -4,7 +4,7 @@ import {app} from "../app";
 import request from "supertest";
 
 declare global {
-    var signin: () => Promise<string>;
+    var signin: () => Promise<string[]>;
 }
 
 let mongo: any;
@@ -35,7 +35,7 @@ global.signin = async () => {
     const email = 'test@test.com';
     const password = 'password';
 
-    const response = request(app)
+    const response = await request(app)
         .post('/api/users/signup')
         .send({
             email, password

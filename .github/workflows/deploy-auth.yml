@@ -1,0 +1,24 @@
+name: deploy-auth
+
+on: 
+  push:
+    branches:
+      -master
+    paths:
+      - 'auth/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build image
+        run: cd auth && docker build -t freeefly/auth .
+      - name: docker login
+        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - name: docker push
+        run: docker push freeefly/auth
+      

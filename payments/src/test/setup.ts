@@ -5,14 +5,18 @@ import request from "supertest";
 import jwt from "jsonwebtoken";
 
 declare global {
-    var signin: () => string[];
+    var signin: (id?: string) => string[];
 }
 
 jest.mock('../nats-wrapper');
 
+process.env.STRIPE_KEY = 'sk_test_hnfrAm8rOkryFEnV23jjfFlw';
+
 let mongo: any;
 beforeAll(async () => {
     process.env.JWT_KEY = 'asdf'
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
     mongo = await MongoMemoryServer.create();
     await mongoose.connect(mongo.getUri(), {
         useNewUrlParser: true,
@@ -35,22 +39,25 @@ afterAll(async () => {
     }
 })
 
-process.env.STRIPE_KEY = 'asdf';
-
-global.signin = () => {
-    // Build a JWT payload. {id, email}
+global.signin = (id?: string) => {
+    // Build a JWT payload.  { id, email }
     const payload = {
-        id: new mongoose.Types.ObjectId().toHexString(),
-        email: 'test@test.com'
+        id: id || new mongoose.Types.ObjectId().toHexString(),
+        email: 'test@test.com',
     };
-    // Create the JWT
+
+    // Create the JWT!
     const token = jwt.sign(payload, process.env.JWT_KEY!);
-    // Build session Object {jwt: MY_JWT}
-    const session = {jwt: token};
+
+    // Build session Object. { jwt: MY_JWT }
+    const session = { jwt: token };
+
     // Turn that session into JSON
     const sessionJSON = JSON.stringify(session);
-    // Tak eJSON and encode it as base64
+
+    // Take JSON and encode it as base64
     const base64 = Buffer.from(sessionJSON).toString('base64');
-    // return a string that's the cookie with the encoded data
+
+    // return a string thats the cookie with the encoded data
     return [`express:sess=${base64}`];
-}
+};

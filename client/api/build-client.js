@@ -3,7 +3,7 @@ import axios from "axios";
 const buildClient = ({req}) => {
     if (typeof window === 'undefined') {
         return axios.create({
-            baseURL: 'www.freefly-app.com',
+            baseURL: 'http://www.freefly-app.com',
             headers: req.headers,
         });
     }
